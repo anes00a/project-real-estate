@@ -18,9 +18,7 @@ export const getPosts = async (req, res) => {
       },
     });
 
-    // setTimeout(() => {
     res.status(200).json(posts);
-    // }, 3000);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Failed to get posts" });
@@ -46,7 +44,7 @@ export const getPost = async (req, res) => {
     const token = req.cookies?.token;
 
     if (token) {
-      jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
+      return jwt.verify(token, process.env.JWT_SECRET_KEY, async (err, payload) => {
         if (!err) {
           const saved = await prisma.savedPost.findUnique({
             where: {
@@ -56,14 +54,18 @@ export const getPost = async (req, res) => {
               },
             },
           });
-          res.status(200).json({ ...post, isSaved: saved ? true : false });
+          return res.status(200).json({ ...post, isSaved: saved ? true : false });
         }
+        // Handle the case where JWT verification fails (optional)
+        return res.status(200).json({ ...post, isSaved: false });
       });
     }
-    res.status(200).json({ ...post, isSaved: false });
+
+    // If no token is present, respond with isSaved: false
+    return res.status(200).json({ ...post, isSaved: false });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to get post" });
+    return res.status(500).json({ message: "Failed to get post" });
   }
 };
 
@@ -81,19 +83,19 @@ export const addPost = async (req, res) => {
         },
       },
     });
-    res.status(200).json(newPost);
+    return res.status(200).json(newPost);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to create post" });
+    return res.status(500).json({ message: "Failed to create post" });
   }
 };
 
 export const updatePost = async (req, res) => {
   try {
-    res.status(200).json();
+    return res.status(200).json();
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to update posts" });
+    return res.status(500).json({ message: "Failed to update posts" });
   }
 };
 
@@ -114,9 +116,9 @@ export const deletePost = async (req, res) => {
       where: { id },
     });
 
-    res.status(200).json({ message: "Post deleted" });
+    return res.status(200).json({ message: "Post deleted" });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to delete post" });
+    return res.status(500).json({ message: "Failed to delete post" });
   }
 };

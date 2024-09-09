@@ -20,6 +20,8 @@ function Register() {
     const email = formData.get("email");
     const password = formData.get("password");
 
+  
+
     try {
       const res = await apiRequest.post("/auth/register", {
         username,
@@ -34,6 +36,8 @@ function Register() {
       setIsLoading(false);
     }
   };
+
+  
   return (
     <div className="registerPage">
       <div className="formContainer">
